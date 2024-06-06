@@ -1,0 +1,97 @@
+##XGBoost model
+
+setwd("D:/STATISTICS/STATsolutions/STAT 52/Thesis")
+
+##Required libraries
+library(readxl)
+library(dplyr)
+library(xgboost)
+library(SHAPforxgboost)
+library(caret)
+library(ggplot2)
+library(MLmetrics)
+
+#Upload data
+data<-read_excel("Model.data.AHC.xlsx",sheet="Data")
+
+#Data split
+data3<-data[c(5:17)]
+#70% of the sample size
+smp_size<-floor(0.7 * nrow(data3))
+print(smp_size)
+## set the seed to make partition reproducible
+set.seed(123)
+train_ind <-sample(seq_len(nrow(data3)),size = smp_size)
+train<-data3[1:smp_size,]
+test <-data3[smp_size+1:nrow(data3),]
+test<-na.omit(test)
+
+##XGBoost model for waterborne
+dtrain<-xgb.DMatrix(data=as.matrix(train),label=train$y20)
+dtest<-xgb.DMatrix(data=as.matrix(test),label=test$y20)
+
+# XGBoost parameters: This hyper-parameters set is tuned one
+params.xgb <- list(booster = "gbtree", 
+                   objective = "reg:squarederror", 
+                   eta =0.1, 
+                   gamma=1, 
+                   min_child_weight = 5,# ,
+                   lambda=1 )
+# xgb corss-validation train
+xgbcv <- xgb.cv(params =  params.xgb, 
+                data = dtrain, 
+                nrounds = 1000, 
+                nfold = 10, 
+                showsd = F,
+                prediction = T,
+                stratified = T, 
+                print_every_n = 1, 
+                early_stopping_rounds = 30, 
+                maximize = F
+)
+#' Final training and metrics evaluation on test sets
+set.seed(1)
+watchlist = list( test = dtest,
+                  train = dtrain) 
+model.xgb <- xgb.train(params = params.xgb, 
+                       data = dtrain, 
+                       nrounds =  47,   
+                       watchlist = watchlist, 
+                       print_every_n = 1, 
+                       early_stopping_rounds =30, 
+                       maximize = F
+)
+
+#prediction in training
+pre<-predict(model.xgb,dtrain)
+RMSE(train$y20,pre)
+MAE(train$y20,pre)
+MAPE(train$y20,pre)
+
+#Model prediction
+pred<-predict(model.xgb,dtest)
+RMSE(test$y20,pred)
+MAE(test$y20,pred)
+MAPE(test$y20,pred)
+
+#Feature importance using mean |SHAP| values for XGBoost model as best
+shap_values <- shap.values(xgb_model = model.xgb, X_train = dtrain)
+shap_values$mean_shap_score
+
+
+# Learning curve
+ggplot(data = xgbcv$evaluation_log, aes(x = iter, y = train_rmse_mean, color = "Train")) +
+  geom_line() +
+  geom_line(data = xgbcv$evaluation_log, aes(x = iter, y = test_rmse_mean, color = "Test")) +
+  labs(title = "Learning Curve", x = "Boosting Rounds", y = "RMSE") +
+  scale_color_manual(values = c("Train" = "blue", "Test" = "red"))+theme_bw()
+
+
+##SHAP plot
+
+shap3<-read_excel("mean.shap.AHC.xlsx",sheet="water");shap3
+fig3<-ggplot(shap3,aes(x=SHAP,y=reorder(Feature,SHAP),fill=Feature))+
+  geom_bar(stat="identity",position = "dodge")+theme(text = element_text(size=18))+
+  theme_set(theme_bw()+theme(legend.position ="none"))+
+  ggtitle("Mean SHAP for Waterborne disease")+xlab("mean |SHAP|")+ylab("Features")
+fig3

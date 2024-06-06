@@ -1,0 +1,50 @@
+##Incidence Mapping
+setwd("D:/STATISTICS/STATsolutions/STAT 52/Thesis")
+
+library(ggplot2)
+library(sf)
+library(gridExtra)
+
+##Load the spatial data
+spatial_data<-st_read("gadm40_BGD_2.shp")
+View(spatial_data)
+
+#Load the incidence data
+incidence_data<-read.csv(file.choose(),header=T)
+
+#Merge both spatial and disease data
+merged_data<-merge(spatial_data,incidence_data,by.x="NAME_2",by.y="NAME_2")
+View(merged_data)
+
+#waterborne disease mapping
+p1<-ggplot(data = merged_data) +
+  geom_sf(aes(fill = Cholera), color = "white") +
+  scale_fill_gradient(low = "lightsalmon", high = "darkolivegreen", name = "Cholera cases") +
+  labs(title = "A", subtitle = "") +
+  theme_minimal()+xlab("")+ylab("Latitude");p13
+
+p2<-ggplot(data = merged_data) +
+  geom_sf(aes(fill = Typhoid), color = "white") +
+  scale_fill_gradient(low = "lightsalmon", high = "darkolivegreen", name = "Typhoid cases") +
+  labs(title = "B", subtitle = "") +
+  theme_minimal()+xlab("")+ylab("");p14
+
+p3<-ggplot(data = merged_data) +
+  geom_sf(aes(fill = Amoebiasis), color = "white") +
+  scale_fill_gradient(low = "lightsalmon", high = "darkolivegreen", name = "Amoebiasis cases") +
+  labs(title = "C", subtitle = "") +
+  theme_minimal()+xlab("Longitude")+ylab("");p15
+
+p4<-ggplot(data = merged_data) +
+  geom_sf(aes(fill = Diarrhea), color = "white") +
+  scale_fill_gradient(low = "lightsalmon", high = "darkolivegreen", name = "Diarrhea cases") +
+  labs(title = "D", subtitle = "") +
+  theme_minimal()+xlab("Longitude")+ylab("Latitude");p16
+
+p5<-ggplot(data = merged_data) +
+  geom_sf(aes(fill = Hepatitis_A), color = "white") +
+  scale_fill_gradient(low = "lightsalmon", high = "darkolivegreen", name = "Hepatitis A cases") +
+  labs(title = "E", subtitle = "") +
+  theme_minimal()+xlab("Longitude")+ylab("");p17
+
+grid.arrange(p1,p2,p3,p4,p5,ncol=3)

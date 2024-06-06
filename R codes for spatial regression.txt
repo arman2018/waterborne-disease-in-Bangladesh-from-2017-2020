@@ -1,0 +1,44 @@
+##Spatial regression
+##My working directory
+setwd("D:/STATISTICS/STATsolutions/STAT 52/Thesis")
+
+# Load the packages
+library(readxl)
+library(sp)
+library(sf)
+library(spData)
+library(spdep)
+library(spatialreg)
+library(lmtest)
+
+
+#Upload data
+data<-read_excel("Model.data.AHC.xlsx",sheet="spatial")
+# Assuming your dataset is named "df"
+coordinates(data) <- c("Longitude", "Latitude")
+proj4string(data) <- CRS("+proj=longlat +datum=WGS84")
+
+# Example using Queen contiguity
+w <- dnearneigh(data, d1 = 0, d2=50)  # Adjust the distance threshold (d2) as needed
+w <- nb2listw(w)
+
+
+model1 <- errorsarlm(y1~x1, data = data, listw = w)#d2=1
+coeftest(model13)
+
+model2 <- errorsarlm(y2~x1+x3+x4, data = data, listw = w)#d2=1
+coeftest(model14)
+
+model3 <- errorsarlm(y3~x2+x7, data = data, listw = w)#d2=50
+coeftest(model15)
+
+model4 <- errorsarlm(y4~x1+x2, data = data, listw = w)#d2=50
+coeftest(model16)
+
+model5 <- errorsarlm(y5~x1+x3+x4+x5, data = data, listw = w)#d2=1
+coeftest(model17)
+
+#Overall disease modelling
+
+water<-errorsarlm(y6~x1+x2, data = data, listw = w)#d2=50
+coeftest(water)
