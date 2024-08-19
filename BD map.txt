@@ -1,0 +1,25 @@
+setwd("D:/Research/Waterborne study")
+library(sf)
+library(ggplot2)
+##Load the spatial data
+spatial_data<-st_read("gadm40_BGD_1.shp")
+View(spatial_data)
+
+
+# Determine the number of unique values in NAME_1
+unique_values <- unique(spatial_data$NAME_1)
+num_values <- length(unique_values)
+
+# Create a bright color palette
+# Using RColorBrewer's 'Set1' which is bright and has a good number of colors
+color_palette <- RColorBrewer::brewer.pal(n = num_values, name = "Set1")
+
+# Plot the Bangladesh map
+ggplot(data = spatial_data) +
+  geom_sf(aes(fill = NAME_1)) +  # Add color by region (change NAME_1 if needed)
+  scale_fill_manual(values = color_palette) +  # Use the bright color palette
+  theme_minimal() +  # Use a minimal theme
+  xlab("Longitude") +  # X-axis label
+  ylab("Latitude") +  # Y-axis label
+  ggtitle("") +  # Title of the plot
+  theme(legend.position = "none")  # Remove legend
