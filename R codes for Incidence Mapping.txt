@@ -1,5 +1,5 @@
 ##Incidence Mapping
-setwd("D:/STATISTICS/STATsolutions/STAT 52/Thesis")
+setwd("D:/Research/Waterborne study")
 
 library(ggplot2)
 library(sf)
@@ -19,32 +19,74 @@ View(merged_data)
 #waterborne disease mapping
 p1<-ggplot(data = merged_data) +
   geom_sf(aes(fill = Cholera), color = "white") +
-  scale_fill_gradient(low = "lightsalmon", high = "darkolivegreen", name = "Cholera cases") +
-  labs(title = "A", subtitle = "") +
-  theme_minimal()+xlab("")+ylab("Latitude");p13
+  scale_fill_gradient(low = "lightgoldenrodyellow", high = "firebrick", name = "Incidence") +
+  labs(title = "A: Cholera", subtitle = "") +
+  theme_minimal()+xlab("")+ylab("Latitude")+
+  theme(
+    axis.text = element_text(size = 14),
+    axis.title = element_text(size = 16),
+    legend.text = element_text(size = 14),
+    legend.title = element_text(size = 16)
+  );p1
 
 p2<-ggplot(data = merged_data) +
   geom_sf(aes(fill = Typhoid), color = "white") +
-  scale_fill_gradient(low = "lightsalmon", high = "darkolivegreen", name = "Typhoid cases") +
-  labs(title = "B", subtitle = "") +
-  theme_minimal()+xlab("")+ylab("");p14
+  scale_fill_gradient(low = "lightgoldenrodyellow", high = "firebrick", name = "Incidence") +
+  labs(title = "B: Typhoid", subtitle = "") +
+  theme_minimal()+xlab("")+ylab("")+
+  theme(
+    axis.text = element_text(size = 14),
+    axis.title = element_text(size = 16),
+    legend.text = element_text(size = 14),
+    legend.title = element_text(size = 16)
+  );p2
 
 p3<-ggplot(data = merged_data) +
   geom_sf(aes(fill = Amoebiasis), color = "white") +
-  scale_fill_gradient(low = "lightsalmon", high = "darkolivegreen", name = "Amoebiasis cases") +
-  labs(title = "C", subtitle = "") +
-  theme_minimal()+xlab("Longitude")+ylab("");p15
+  scale_fill_gradient(low = "lightgoldenrodyellow", high = "firebrick", name = "Incidence") +
+  labs(title = "C: Amoebiasis", subtitle = "") +
+  theme_minimal()+xlab("")+ylab("")+
+  theme(
+    axis.text = element_text(size = 14),
+    axis.title = element_text(size = 16),
+    legend.text = element_text(size = 14),
+    legend.title = element_text(size = 16)
+  );p3
 
 p4<-ggplot(data = merged_data) +
   geom_sf(aes(fill = Diarrhea), color = "white") +
-  scale_fill_gradient(low = "lightsalmon", high = "darkolivegreen", name = "Diarrhea cases") +
-  labs(title = "D", subtitle = "") +
-  theme_minimal()+xlab("Longitude")+ylab("Latitude");p16
+  scale_fill_gradient(low = "lightgoldenrodyellow", high = "firebrick", name = "Incidence") +
+  labs(title = "D: Diarrhea", subtitle = "") +
+  theme_minimal()+xlab("Longitude")+ylab("Latitude")+
+  theme(
+    axis.text = element_text(size = 14),
+    axis.title = element_text(size = 16),
+    legend.text = element_text(size = 14),
+    legend.title = element_text(size = 16)
+  );p4
 
 p5<-ggplot(data = merged_data) +
-  geom_sf(aes(fill = Hepatitis_A), color = "white") +
-  scale_fill_gradient(low = "lightsalmon", high = "darkolivegreen", name = "Hepatitis A cases") +
-  labs(title = "E", subtitle = "") +
-  theme_minimal()+xlab("Longitude")+ylab("");p17
+  geom_sf(aes(fill = Hepatitis.A), color = "white") +
+  scale_fill_gradient(low = "lightgoldenrodyellow", high = "firebrick", name = "Incidence") +
+  labs(title = "E: Hepatitis A", subtitle = "") +
+  theme_minimal()+xlab("Longitude")+ylab("")+
+  theme(
+    axis.text = element_text(size = 14),
+    axis.title = element_text(size = 16),
+    legend.text = element_text(size = 14),
+    legend.title = element_text(size = 16)
+  );p5
 
-grid.arrange(p1,p2,p3,p4,p5,ncol=3)
+p6<-ggplot(data = merged_data) +
+  geom_sf(aes(fill = Overall), color = "white") +
+  scale_fill_gradient(low = "lightgoldenrodyellow", high = "firebrick", name = "Incidence") +
+  labs(title = "F: Total waterborne diseases", subtitle = "") +
+  theme_minimal()+xlab("Longitude")+ylab("")+
+  theme(
+    axis.text = element_text(size = 14),
+    axis.title = element_text(size = 16),
+    legend.text = element_text(size = 14),
+    legend.title = element_text(size = 16)
+  );p6
+
+grid.arrange(p1,p2,p3,p4,p5,p6,ncol=3)
