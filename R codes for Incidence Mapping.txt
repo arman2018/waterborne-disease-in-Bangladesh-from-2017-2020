@@ -1,7 +1,9 @@
 ##Incidence Mapping
-setwd("D:/Research/Waterborne study")
+setwd("D:/arman2018/Research/Waterborne study")
 
+library(readxl)
 library(ggplot2)
+library(ggcorrplot)
 library(sf)
 library(gridExtra)
 
@@ -45,7 +47,7 @@ p3<-ggplot(data = merged_data) +
   geom_sf(aes(fill = Amoebiasis), color = "white") +
   scale_fill_gradient(low = "lightgoldenrodyellow", high = "firebrick", name = "Incidence") +
   labs(title = "C: Amoebiasis", subtitle = "") +
-  theme_minimal()+xlab("")+ylab("")+
+  theme_minimal()+xlab("Longitude")+ylab("Latitude")+
   theme(
     axis.text = element_text(size = 14),
     axis.title = element_text(size = 16),
@@ -53,11 +55,12 @@ p3<-ggplot(data = merged_data) +
     legend.title = element_text(size = 16)
   );p3
 
+
 p4<-ggplot(data = merged_data) +
-  geom_sf(aes(fill = Diarrhea), color = "white") +
+  geom_sf(aes(fill = Hepatitis.A), color = "white") +
   scale_fill_gradient(low = "lightgoldenrodyellow", high = "firebrick", name = "Incidence") +
-  labs(title = "D: Diarrhea", subtitle = "") +
-  theme_minimal()+xlab("Longitude")+ylab("Latitude")+
+  labs(title = "D: Hepatitis A", subtitle = "") +
+  theme_minimal()+xlab("Longitude")+ylab("")+
   theme(
     axis.text = element_text(size = 14),
     axis.title = element_text(size = 16),
@@ -66,10 +69,10 @@ p4<-ggplot(data = merged_data) +
   );p4
 
 p5<-ggplot(data = merged_data) +
-  geom_sf(aes(fill = Hepatitis.A), color = "white") +
+  geom_sf(aes(fill = Overall), color = "white") +
   scale_fill_gradient(low = "lightgoldenrodyellow", high = "firebrick", name = "Incidence") +
-  labs(title = "E: Hepatitis A", subtitle = "") +
-  theme_minimal()+xlab("Longitude")+ylab("")+
+  labs(title = "", subtitle = "") +
+  theme_minimal()+xlab("Longitude")+ylab("Latitude")+
   theme(
     axis.text = element_text(size = 14),
     axis.title = element_text(size = 16),
@@ -77,16 +80,4 @@ p5<-ggplot(data = merged_data) +
     legend.title = element_text(size = 16)
   );p5
 
-p6<-ggplot(data = merged_data) +
-  geom_sf(aes(fill = Overall), color = "white") +
-  scale_fill_gradient(low = "lightgoldenrodyellow", high = "firebrick", name = "Incidence") +
-  labs(title = "F: Total waterborne diseases", subtitle = "") +
-  theme_minimal()+xlab("Longitude")+ylab("")+
-  theme(
-    axis.text = element_text(size = 14),
-    axis.title = element_text(size = 16),
-    legend.text = element_text(size = 14),
-    legend.title = element_text(size = 16)
-  );p6
-
-grid.arrange(p1,p2,p3,p4,p5,p6,ncol=3)
+grid.arrange(p1,p2,p3,p4,ncol=2)
