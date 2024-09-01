@@ -1,6 +1,6 @@
 ##Spatial regression
 ##My working directory
-setwd("D:/STATISTICS/STATsolutions/STAT 52/Thesis")
+setwd("D:/Research/Waterborne study")
 
 # Load the packages
 library(readxl)
@@ -13,7 +13,7 @@ library(lmtest)
 
 
 #Upload data
-data<-read_excel("Model.data.AHC.xlsx",sheet="spatial")
+data<-read_excel("correlation data.xlsx")
 # Assuming your dataset is named "df"
 coordinates(data) <- c("Longitude", "Latitude")
 proj4string(data) <- CRS("+proj=longlat +datum=WGS84")
@@ -24,21 +24,18 @@ w <- nb2listw(w)
 
 
 model1 <- errorsarlm(y1~x1, data = data, listw = w)#d2=1
-coeftest(model13)
+coeftest(model1)
 
 model2 <- errorsarlm(y2~x1+x3+x4, data = data, listw = w)#d2=1
-coeftest(model14)
+coeftest(model2)
 
 model3 <- errorsarlm(y3~x2+x7, data = data, listw = w)#d2=50
-coeftest(model15)
+coeftest(model3)
 
-model4 <- errorsarlm(y4~x1+x2, data = data, listw = w)#d2=50
-coeftest(model16)
-
-model5 <- errorsarlm(y5~x1+x3+x4+x5, data = data, listw = w)#d2=1
-coeftest(model17)
+model4 <- errorsarlm(y4~x1+x3+x4+x5, data = data, listw = w)#d2=1
+coeftest(model4)
 
 #Overall disease modelling
 
-water<-errorsarlm(y6~x1+x2, data = data, listw = w)#d2=50
+water<-errorsarlm(y5~x1+x2, data = data, listw = w)#d2=50
 coeftest(water)
