@@ -1,6 +1,6 @@
 ##XGBoost model
-
-setwd("D:/STATISTICS/STATsolutions/STAT 52/Thesis")
+##My working directory 
+setwd("D:/arman18/Research/Waterborne study")
 
 ##Required libraries
 library(readxl)
@@ -8,35 +8,38 @@ library(dplyr)
 library(xgboost)
 library(SHAPforxgboost)
 library(caret)
+library(rpart)
+library(randomForest)
 library(ggplot2)
 library(MLmetrics)
 
 #Upload data
 data<-read_excel("Model.data.AHC.xlsx",sheet="Data")
 
-#Data split
-data3<-data[c(5:17)]
-#70% of the sample size
-smp_size<-floor(0.7 * nrow(data3))
-print(smp_size)
-## set the seed to make partition reproducible
-set.seed(123)
-train_ind <-sample(seq_len(nrow(data3)),size = smp_size)
-train<-data3[1:smp_size,]
-test <-data3[smp_size+1:nrow(data3),]
-test<-na.omit(test)
+#selected variables for model
+data1<-data[c(5:11,16)]
+
+#data partition
+set.seed(123)  # For reproducibility
+trainIndex <- createDataPartition(data1$y5, p = 0.7, 
+                                  list = FALSE,
+                                  times = 1)
+training_data <-data1[trainIndex, ]
+testing_data <-data1[-trainIndex, ]
 
 ##XGBoost model for waterborne
-dtrain<-xgb.DMatrix(data=as.matrix(train),label=train$y20)
-dtest<-xgb.DMatrix(data=as.matrix(test),label=test$y20)
+dtrain<-xgb.DMatrix(data=as.matrix(training_data),label=training_data$y5)
+dtest<-xgb.DMatrix(data=as.matrix(testing_data),label=testing_data$y5)
 
 # XGBoost parameters: This hyper-parameters set is tuned one
 params.xgb <- list(booster = "gbtree", 
                    objective = "reg:squarederror", 
-                   eta =0.1, 
-                   gamma=1, 
-                   min_child_weight = 5,# ,
-                   lambda=1 )
+                   eta =0.05, #Reduced learning rate 
+                   gamma=5, #Increased to prevent overfitting
+                   min_child_weight = 10, # Increased to control complexity
+                   lambda=1, #Increased for stronger L2 regularization
+                   alpha=0.5 #Added L1 regularizatio
+                   )
 # xgb corss-validation train
 xgbcv <- xgb.cv(params =  params.xgb, 
                 data = dtrain, 
@@ -55,7 +58,7 @@ watchlist = list( test = dtest,
                   train = dtrain) 
 model.xgb <- xgb.train(params = params.xgb, 
                        data = dtrain, 
-                       nrounds =  47,   
+                       nrounds =  46,   
                        watchlist = watchlist, 
                        print_every_n = 1, 
                        early_stopping_rounds =30, 
@@ -64,15 +67,15 @@ model.xgb <- xgb.train(params = params.xgb,
 
 #prediction in training
 pre<-predict(model.xgb,dtrain)
-RMSE(train$y20,pre)
-MAE(train$y20,pre)
-MAPE(train$y20,pre)
+RMSE(training_data$y5,pre)
+MAE(training_data$y5,pre)
+MAPE(training_data$y5,pre)
 
 #Model prediction
 pred<-predict(model.xgb,dtest)
-RMSE(test$y20,pred)
-MAE(test$y20,pred)
-MAPE(test$y20,pred)
+RMSE(testing_data$y5,pred)
+MAE(testing_data$y5,pred)
+MAPE(testing_data$y5,pred)
 
 #Feature importance using mean |SHAP| values for XGBoost model as best
 shap_values <- shap.values(xgb_model = model.xgb, X_train = dtrain)
@@ -85,13 +88,3 @@ ggplot(data = xgbcv$evaluation_log, aes(x = iter, y = train_rmse_mean, color = "
   geom_line(data = xgbcv$evaluation_log, aes(x = iter, y = test_rmse_mean, color = "Test")) +
   labs(title = "Learning Curve", x = "Boosting Rounds", y = "RMSE") +
   scale_color_manual(values = c("Train" = "blue", "Test" = "red"))+theme_bw()
-
-
-##SHAP plot
-
-shap3<-read_excel("mean.shap.AHC.xlsx",sheet="water");shap3
-fig3<-ggplot(shap3,aes(x=SHAP,y=reorder(Feature,SHAP),fill=Feature))+
-  geom_bar(stat="identity",position = "dodge")+theme(text = element_text(size=18))+
-  theme_set(theme_bw()+theme(legend.position ="none"))+
-  ggtitle("Mean SHAP for Waterborne disease")+xlab("mean |SHAP|")+ylab("Features")
-fig3
